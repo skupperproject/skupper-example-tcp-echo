@@ -1,80 +1,65 @@
 package main
 
-import ( 
-         "fmt"
-         "io"
-         "net"
-         "os"
-         "strings"
-       )
-
-
+import (
+	"fmt"
+	"io"
+	"net"
+	"os"
+	"strings"
+)
 
 var fp = fmt.Fprintf
 
-
-
-
-
 // Handle a connection. Read messages from it and reply with the
-// same message uppercased. Terminate the connection when we reach 
+// same message uppercased. Terminate the connection when we reach
 // EOF,or an error.
-func cnx_handler ( cnx_number   int, 
-                   hostname     string,
-                   cnx          net.Conn ) {
-  buffer := make ( []byte, 512 )
+func cnx_handler(cnx_number int,
+	hostname string,
+	cnx net.Conn) {
+	buffer := make([]byte, 512)
 
-  for {
-    n, err := cnx.Read ( buffer )
+	for {
+		n, err := cnx.Read(buffer)
 
-    if err != nil {
-      if err != io.EOF {
-        fp ( os.Stderr, "Connection read error: |%s|\n", err.Error() )
-      }
-      break
-    }
+		if err != nil {
+			if err != io.EOF {
+				fp(os.Stderr, "Connection read error: |%s|\n", err.Error())
+			}
+			break
+		}
 
-    // If we have received a message, uppercase it and send it
-    // back as the reply.
-    if n > 0 {
-      message := string(buffer[0:n])
-      fp ( os.Stdout, "received from cnx %d : |%s|\n", cnx_number, message )
-      reply := hostname + " : " + strings.ToUpper ( message )
-      cnx.Write ( []byte ( reply + "\n" ) )
-    }
-  }
-  cnx.Close ( )
-  fp ( os.Stdout, "TCP handler for connection %d exiting.\n", cnx_number )
+		// If we have received a message, uppercase it and send it
+		// back as the reply.
+		if n > 0 {
+			message := string(buffer[0:n])
+			fp(os.Stdout, "received from cnx %d : |%s|\n", cnx_number, message)
+			reply := hostname + " : " + strings.ToUpper(message)
+			cnx.Write([]byte(reply + "\n"))
+		}
+	}
+	cnx.Close()
+	fp(os.Stdout, "TCP handler for connection %d exiting.\n", cnx_number)
 }
 
+func main() {
+	cnx_count := 0
 
+	port := "9090"
 
+	// Listen for TCP connections on any interface on this port.
+	tcp_listener, _ := net.Listen("tcp", ":"+port)
 
+	fp(os.Stdout, "tcp-echo server listening on port %s.\n", port)
 
-func main ( ) {
-  cnx_count := 0
+	hostname := os.Getenv("HOSTNAME")
 
-  port := "9090"
-
-  // Listen for TCP connections on any interface on this port.
-  tcp_listener, _ := net.Listen ( "tcp", ":" + port )
-
-  fp ( os.Stdout, "tcp-echo server listening on port %s.\n", port )
-
-  hostname := os.Getenv ( "HOSTNAME" )
-
-  // Handle each new connection in its own goroutine. Tell each 
-  // one what number it is so the user can see which handler is 
-  // printing out each message.
-  for {
-    cnx, _ := tcp_listener.Accept ( )
-    cnx_count ++
-    fp ( os.Stdout, "server: made connection %d.\n", cnx_count )
-    go cnx_handler ( cnx_count, hostname, cnx )
-  }
+	// Handle each new connection in its own goroutine. Tell each
+	// one what number it is so the user can see which handler is
+	// printing out each message.
+	for {
+		cnx, _ := tcp_listener.Accept()
+		cnx_count++
+		fp(os.Stdout, "server: made connection %d.\n", cnx_count)
+		go cnx_handler(cnx_count, hostname, cnx)
+	}
 }
-
-
-
-
-
