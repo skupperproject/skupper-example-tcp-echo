@@ -2,13 +2,13 @@
 
 NOTE : This is a DRAFT in progress. The instructions do not actually work yet.
 
-This is a simple demonstration of TCP communication from a private to a public cluster, and back again. We will set up a Skupper network between the two clusters, start a TCP echo-server on the public cluster, and then telnet to it from the private cluster, and receive its replies.
+This is a simple demonstration of TCP communication from a private to a public cluster, and back again. We will set up a Skupper network between the two clusters, start a TCP echo-server on the public cluster, and then communicate to it from the private cluster, and receive its replies.
 
 * [Prerequisites](#prerequisites)
 * [Step 1](#step-1-set-up-the-demo)
 * [Step 2](#step-2-set-up-the-inter-cluster-skupper-network)
 * [Step 3](#step-3-deploy-the-server-and-services)
-* [Step 4](#step-4-telnet-from-private-to-public)
+* [Step 4](#step-4-netcat-from-private-to-public)
 
 ## Prerequisites
 
@@ -82,21 +82,19 @@ You will need two clusters: one which we will call 'private' and one which we wi
   TODO -- PRIVATE CLUSTER ANNOTATE COMMAND GOES HERE
   ```
 
-## Step 4 : telnet from private to public
+## Step 4 : netcat from private to public
 
-1. On the private cluster, find the IP address and port of the service and telnet to it. Skupper routes your message from the private to the public cluster where it is capitalized by the tcp-echo service and returned to you. ( Also, the server prepends its pod ID to the capitalized message. )
+1. On the private cluster, find the IP address and port of the service and netcat to it. Skupper routes your message from the private to the public cluster where it is capitalized by the tcp-echo service and returned to you. ( Also, the server prepends its pod ID to the capitalized message. )
 
   ```bash
   $ kubectl get svc
   TODO -- SHOW EXAMPLE OUTPUT HERE
 
 
-  $ telnet 172.30.67.11 27031/TCP 
-  Trying 127.0.0.1...
-  Connected to 127.0.0.1.
-  Escape character is '^]'.
+  $ netcat 172.30.67.11 27031
   Does this really work?
   53c9235e175e : DOES THIS REALLY WORK?
+
   Yes! This really works!
   53c9235e175e : YES! THIS REALLY WORKS!
   ```
