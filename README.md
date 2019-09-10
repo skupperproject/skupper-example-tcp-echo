@@ -19,22 +19,17 @@ You will need two clusters: one which we will call 'private' and one which we wi
 1. On the private cluster make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
 
    ```bash
-   $ mkdir ~/tcp-echo-demo
-   $ cd !$
-   $ git clone https://github.com/skupperproject/tcp-echo-demo
-   $ # Here is the skupper CLI tool :
-   $ curl -fL https://github.com/skupperproject/skupper-cli/releases/download/dummy3/linux.tgz -o skupper.tgz
-   $ mkdir -p $HOME/bin
-   $ tar -xf skupper.tgz --directory $HOME/bin
-   $ export PATH=$PATH:$HOME/bin
+   mkdir ~/tcp-echo-demo
+   cd !$
+   git clone https://github.com/skupperproject/tcp-echo-demo
+   # Here is the skupper CLI tool :
+   curl -fL https://github.com/skupperproject/skupper-cli/releases/download/dummy3/linux.tgz -o skupper.tgz
+   mkdir -p $HOME/bin
+   tar -xf skupper.tgz --directory $HOME/bin
+   export PATH=$PATH:$HOME/bin
    ```
 
    To test your installation, run the 'skupper' command with no arguments. It will print a usage summary.
-
-   ```bash
-   $ skupper [command]
-   [...]
-   ```
 
 
 ## Step 2 : Set up the inter-cluster Skupper network
@@ -44,15 +39,15 @@ You will need two clusters: one which we will call 'private' and one which we wi
    NOTE: We assume here that you have two separate shells (windows), one logged in to the 'public' cluster and on logged into the 'private' cluster. But both are on the same machine, and thus both have access to the secrets file which we are about to create.
 
   ```bash
-  $ skupper init --id public
-  $ skupper secret ~/tcp-echo-demo/secret.yaml -i public
+  skupper init --id public
+  skupper secret ~/tcp-echo-demo/secret.yaml -i public
    ```
 
 2. On the 'private' cluster, deploy the 'private' Skupper router, and connect to 'public' cluster.
 
   ```bash
-  $ skupper init --edge --id private
-  $ skupper connect ~/tcp-echo-demo/secret.yaml --name public
+  skupper init --edge --id private
+  skupper connect ~/tcp-echo-demo/secret.yaml --name public
    ```
 
 
@@ -61,7 +56,7 @@ You will need two clusters: one which we will call 'private' and one which we wi
 1. On the 'public' cluster, deploy the tcp-echo server, and the service that exposes it.
 
   ```bash
-  $ oc apply -f ~/tcp-echo-demo/public-deployment-and-service.yaml
+  oc apply -f ~/tcp-echo-demo/public-deployment-and-service.yaml
    ```
 
 2. Annotate the service. This will cause Skupper to notice the service and prepare to connect it to other clusters.
@@ -73,7 +68,7 @@ You will need two clusters: one which we will call 'private' and one which we wi
 3. On the 'private' cluster, deploy the service only.
 
   ```bash
-  $ oc apply -f i~/tcp-echo-demo/private-service-only.yaml
+  oc apply -f ~/tcp-echo-demo/private-service-only.yaml
   ```
 
 4. Annotate the private service. This will cause Skupper to notice it, and connect it to its counterpart on the other cluster.
@@ -87,16 +82,16 @@ You will need two clusters: one which we will call 'private' and one which we wi
 1. On the private cluster, find the IP address and port of the service and netcat to it. Skupper routes your message from the private to the public cluster where it is capitalized by the tcp-echo service and returned to you. ( Also, the server prepends its pod ID to the capitalized message. )
 
   ```bash
-  $ kubectl get svc
-  TODO -- SHOW EXAMPLE OUTPUT HERE
+  # commands and output
+  kubectl get svc
+  $ TODO -- SHOW EXAMPLE OUTPUT HERE
 
-
-  $ netcat 172.30.67.11 27031
+  netcat 172.30.67.11 27031
   Does this really work?
-  53c9235e175e : DOES THIS REALLY WORK?
+  $ 53c9235e175e : DOES THIS REALLY WORK?
 
   Yes! This really works!
-  53c9235e175e : YES! THIS REALLY WORKS!
+  $ 53c9235e175e : YES! THIS REALLY WORKS!
   ```
 
 
