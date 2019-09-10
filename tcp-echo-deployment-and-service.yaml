@@ -1,0 +1,39 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tcp-go-echo
+spec:
+  replicas: 1
+  selectors:
+    matchLabels:
+      application: tcp-go-echo
+  template:
+    metadata:
+      labels:
+        application: tcp-go-echo
+    spec:
+      containers:
+        - image: quay.io/skupper/tcp-go-echo
+          name: tcp-go-echo
+          command:
+            - tcp-go-echo
+            - "--replSet"
+            - rs0
+            - "--bind_ip_all"
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-go-echo
+  annotations:
+    skupper.io/proxy: tcp
+    internal.skupper.io/origin: none
+spec:
+  ports:
+  - port: 27031
+    targetPort: 27031
+  selector:
+    application: tcp-go-echo
+---
