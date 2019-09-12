@@ -5,9 +5,6 @@ metadata:
   name: tcp-go-echo
 spec:
   replicas: 1
-  selectors:
-    matchLabels:
-      application: tcp-go-echo
   template:
     metadata:
       labels:
@@ -16,11 +13,6 @@ spec:
       containers:
         - image: quay.io/skupper/tcp-go-echo
           name: tcp-go-echo
-          command:
-            - tcp-go-echo
-            - "--replSet"
-            - rs0
-            - "--bind_ip_all"
           imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1
