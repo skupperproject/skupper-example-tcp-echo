@@ -22,7 +22,7 @@ You will need the skupper command line tool installed, and on your executable pa
 
 On your machine make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
 
-   ```bash
+   ```
     mkdir ${HOME}/tcp-echo-demo
     cd !$
     git clone https://github.com/skupperproject/skupper-example-tcp-echo
@@ -32,7 +32,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
 ## Step 2: Start your cluster and define two namespaces.  <a name="step_2"></a>
 
-   ```bash
+   ```
    $ alias kc='kubectl'
    $ oc cluster up
    $ oc new-project public
@@ -43,7 +43,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
 ## Step 3: Start Skupper in the public namespace.  <a name="step_3"></a>
 
-   ```bash
+   ```
    $ kc config set-context --current --namespace=public
    $ skupper status
    skupper not enabled for public
@@ -55,7 +55,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
 ## Step 4: Make a connection token, and start the service. <a name="step_4"></a>
 
-   ```bash
+   ```
    $ skupper connection-token ${HOME}/secret.yaml
    token will only be valid for local cluster
    $ oc apply -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
@@ -66,7 +66,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
 ## Step 5: Start Skupper in the private namespace.  <a name="step_5"></a>
 
-   ```bash
+   ```
    $ kc config set-context --current --namespace=private
    Context "private/127-0-0-1:8443/developer" modified.
    $ skupper status
@@ -82,7 +82,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
 After issuing the connect command, a new service will show up in this namespace called tcp-go-echo. (It may take as long as two minutes for the service to appear.)
 
-   ```bash
+   ```
    $ skupper connect ${HOME}/secret.yaml
    $ kc get svc
    NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)               AGE
@@ -96,7 +96,7 @@ After issuing the connect command, a new service will show up in this namespace 
 
 Using the IP address and port number from the 'kc get svc' result, send a message to the local service. Skupper will route the message to the service that is running on the other namespace, and will route the reply back here.
 
-   ```bash
+   ```
    ncat Mr. Watson, come here. I want to see you.
    tcp-go-echo-67c875768f-kt6dc : MR. WATSON, COME HERE. I WANT TO SEE YOU.
    ```
@@ -116,7 +116,7 @@ We demonstrated this using two namespaces in a single local cluster for ease of 
 
 Let's tidy up so no one trips over any of this stuff later. In the private namespace, delete the Skupper artifacts. In public, delete both Kubernetes and Skupper atrifacts.
 
-   ```bash
+   ```
    $ kc config set-context --current --namespace=private
    Context "private/127-0-0-1:8443/developer" modified.
    $ skupper delete
