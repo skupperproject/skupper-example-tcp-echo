@@ -1,7 +1,5 @@
 # Skupper enables inter-cluster TCP communication.
 
-NOTE : This is a DRAFT in progress. The instructions do not actually work yet.
-
 This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public namespace and back again. We will set up a Skupper network between the two namespaces, start a TCP echo-server on the public namespace, then communicate to it from the private namespace, and receive its replies. We will assume that Kubernetes is running on your local machine, and we will create and access both namespaces from within a single shell.
 
 * [Prerequisites](#prereq)
