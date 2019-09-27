@@ -2,96 +2,115 @@
 
 NOTE : This is a DRAFT in progress. The instructions do not actually work yet.
 
-This is a simple demonstration of TCP communication from a private to a public cluster, and back again. We will set up a Skupper network between the two clusters, start a TCP echo-server on the public cluster, and then communicate to it from the private cluster, and receive its replies.
+This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public namespace and back again. We will set up a Skupper network between the two namespaces, start a TCP echo-server on the public namespace, then communicate to it from the private namespace, and receive its replies. We will assume that Kubernetes is running on your local machine, and we will create and access both namespaces from within a single shell.
 
-* [Prerequisites](#prerequisites)
-* [Step 1](#step-1-set-up-the-demo)
-* [Step 2](#step-2-set-up-the-inter-cluster-skupper-network)
-* [Step 3](#step-3-deploy-the-server-and-services)
-* [Step 4](#step-4-netcat-from-private-to-public)
+* [Prerequisites](#prereq)
+* [Step 1: Set up the demo.](#step_1)
+* [Step 2: Start your cluster and define two namespaces.](#step_2)
+* [Step 3: Start Skupper in the public namespace.](#step_3)
+* [Step 4: Make a connection token, and start the service.](#step_4)
+* [Step 5: Start Skupper in the private namespace..](#step_5)
+* [Step 6: Make the connection.](#step_6)
+* [Step 7: Communicate across namespaces.](#step_7)
+* [Step 8: Cleanup.](#step_8)
 
-## Prerequisites
+## Prerequisites  <a name="prereq"></a>
 
-You will need two clusters: one which we will call 'private' and one which we will call 'public'.
+You will need the skupper command line tool installed, and on your executable path.
 
-## Step 1 : Set up the demo
 
-1. On the private cluster make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
+
+## Step 1: Set up the demo. <a name="step_1"></a>
+
+On your machine make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
 
    ```bash
-   mkdir ~/tcp-echo-demo
-   cd !$
-   git clone https://github.com/skupperproject/tcp-echo-demo
-   # Here is the skupper CLI tool :
-   curl -fL https://github.com/skupperproject/skupper-cli/releases/download/dummy3/linux.tgz -o skupper.tgz
-   mkdir -p $HOME/bin
-   tar -xf skupper.tgz --directory $HOME/bin
-   export PATH=$PATH:$HOME/bin
-   ```
-
-   To test your installation, run the 'skupper' command with no arguments. It will print a usage summary.
-
-
-## Step 2 : Set up the inter-cluster Skupper network
-
-1. On the 'public' cluster, deploy the 'public' Skupper router and create the secret that will allow 'private' to connect to 'public'.
-
-   NOTE: We assume here that you have two separate shells (windows), one logged in to the 'public' cluster and on logged into the 'private' cluster. But both are on the same machine, and thus both have access to the secrets file which we are about to create.
-
-  ```bash
-  skupper init --id public
-  skupper secret ~/tcp-echo-demo/secret.yaml -i public
-   ```
-
-2. On the 'private' cluster, deploy the 'private' Skupper router, and connect to 'public' cluster.
-
-  ```bash
-  skupper init --edge --id private
-  skupper connect ~/tcp-echo-demo/secret.yaml --name public
+    mkdir ~/tcp-echo-demo
+    cd !$
+    git clone https://github.com/skupperproject/skupper-example-tcp-echo
    ```
 
 
-## Step 3 : Deploy the server and services
 
-1. On the 'public' cluster, deploy the tcp-echo server, and the service that exposes it.
+## Step 2: Start your cluster and define two namespaces.  <a name="step_2"></a>
 
-  ```bash
-  oc apply -f ~/tcp-echo-demo/public-deployment-and-service.yaml
+   ```bash
+   alias kc='kubectl'
+   oc cluster up
+   oc new-project public
+   oc new-project private
    ```
 
-2. Annotate the service. This will cause Skupper to notice the service and prepare to connect it to other clusters.
+## Step 3: Start Skupper in the public namespace.  <a name="step_3"></a>
 
-  ```bash
-  TODO -- PUBLIC CLUSTER ANNOTATE COMMAND GOES HERE
-  ```
+   ```bash
+   kc config set-context --current --namespace=public
+   skupper status
+   skupper init --cluster-local --id public
+   skupper status
+   ```
 
-3. On the 'private' cluster, deploy the service only.
+## Step 4: Make a connection token, and start the service. <a name="step_4"></a>
 
-  ```bash
-  oc apply -f ~/tcp-echo-demo/private-service-only.yaml
-  ```
+   ```bash
+   skupper connection-token $HOME/secret.yaml
+   oc apply -f ./skupper-example-tcp-echo/public-deployment-and-service.yaml
+   ```
 
-4. Annotate the private service. This will cause Skupper to notice it, and connect it to its counterpart on the other cluster.
+## Step 5: Start Skupper in the private namespace.  <a name="step_5"></a>
 
-  ```bash
-  TODO -- PRIVATE CLUSTER ANNOTATE COMMAND GOES HERE
-  ```
-
-## Step 4 : netcat from private to public
-
-1. On the private cluster, find the IP address and port of the service and netcat to it. Skupper routes your message from the private to the public cluster where it is capitalized by the tcp-echo service and returned to you. ( Also, the server prepends its pod ID to the capitalized message. )
-
-  ```bash
-  # commands and output
-  kubectl get svc
-  $ TODO -- SHOW EXAMPLE OUTPUT HERE
-
-  netcat 172.30.67.11 27031
-  Does this really work?
-  $ 53c9235e175e : DOES THIS REALLY WORK?
-
-  Yes! This really works!
-  $ 53c9235e175e : YES! THIS REALLY WORKS!
-  ```
+   ```bash
+   kc config set-context --current --namespace=private
+   skupper status
+   skupper init --cluster-local --id private
+   skupper status
+   ```
 
 
+## Step 6: Make the connection.  <a name="step_6"></a>
+
+After issuing the connect command, a new service will show up in this namespace called tcp-go-echo. (It may take as long as two minutes for the service to appear.)
+
+   ```bash
+   $ skupper connect $HOME/secret.yaml
+   $ kc get svc
+   NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)               AGE
+   skupper-internal    ClusterIP   172.30.46.68     <none>        55671/TCP,45671/TCP   2m
+   skupper-messaging   ClusterIP   172.30.180.253   <none>        5671/TCP              2m
+   tcp-go-echo         ClusterIP   172.30.17.63     <none>        9090/TCP              38s
+   ```
+
+
+## Step 7: Communicate across namespaces.  <a name="step_7"></a>
+
+Using the IP address and port number from the 'kc get svc' result, send a message to the local service. Skupper will route the message to the service that is running on the other namespace, and will route the reply back here.
+
+   ```bash
+   ncat Mr. Watson, come here. I want to see you.
+   tcp-go-echo-67c875768f-kt6dc : MR. WATSON, COME HERE. I WANT TO SEE YOU.
+   ```
+
+The tcp-go-echo program returns a capitalized version of the message, prepended by its name and pod ID.
+
+
+## What Just Happened ?
+
+Your <i>ncat</i> TCP message was received by the Skupper-created tcp-go-echo proxy in namespace 'private', wrapped in an AMQP message, and sent over the Skupper network to the Skupper-created proxy in the 'public' namespace. That proxy sent the TCP packets to the tcp-go-echo server (which knows nothing about AMQP), received its response, and reversed the process. After another trip over the Skupper network, the TCP response packets arrived back at our ncat process.
+<br/>
+We demonstrated this using two namespaces in a single local cluster for ease of demonstration, but the establishment and use of Skupper connectivity works just as easily between any two (or more) clusters, public or private, anywhere.
+<br/>
+
+
+## Step 8: Cleanup. <a name="step_8"></a>
+
+Let's tidy up so no one trips over any of this stuff later. In the private namespace, delete the Skupper artifacts. In public, delete both Kubernetes and Skupper atrifacts.
+
+   ```bash
+   kc config set-context --current --namespace=private
+   skupper delete
+   kc config set-context --current --namespace=public
+   kc delete -f ./skupper-example-tcp-echo/public-deployment-and-service.yaml
+   skupper delete
+   ```
+<br/>
+<br/>
