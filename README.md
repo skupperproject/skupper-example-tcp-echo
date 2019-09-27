@@ -23,7 +23,7 @@ You will need the skupper command line tool installed, and on your executable pa
 On your machine make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
 
    ```bash
-    mkdir ~/tcp-echo-demo
+    mkdir ${HOME}/tcp-echo-demo
     cd !$
     git clone https://github.com/skupperproject/skupper-example-tcp-echo
    ```
@@ -51,8 +51,8 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 ## Step 4: Make a connection token, and start the service. <a name="step_4"></a>
 
    ```bash
-   skupper connection-token $HOME/secret.yaml
-   oc apply -f ./skupper-example-tcp-echo/public-deployment-and-service.yaml
+   skupper connection-token ${HOME}/secret.yaml
+   oc apply -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
    ```
 
 ## Step 5: Start Skupper in the private namespace.  <a name="step_5"></a>
@@ -70,7 +70,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 After issuing the connect command, a new service will show up in this namespace called tcp-go-echo. (It may take as long as two minutes for the service to appear.)
 
    ```bash
-   $ skupper connect $HOME/secret.yaml
+   $ skupper connect ${HOME}/secret.yaml
    $ kc get svc
    NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)               AGE
    skupper-internal    ClusterIP   172.30.46.68     <none>        55671/TCP,45671/TCP   2m
@@ -107,7 +107,7 @@ Let's tidy up so no one trips over any of this stuff later. In the private names
    kc config set-context --current --namespace=private
    skupper delete
    kc config set-context --current --namespace=public
-   kc delete -f ./skupper-example-tcp-echo/public-deployment-and-service.yaml
+   kc delete -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
    skupper delete
    ```
 <br/>
