@@ -24,8 +24,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 
    ```
     mkdir ${HOME}/tcp-echo-demo
-    cd !$
-    git clone https://github.com/skupperproject/skupper-example-tcp-echo
+    git clone https://github.com/skupperproject/skupper-example-tcp-echo ${HOME}/tcp-echo-demo
    ```
 
 
