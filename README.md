@@ -33,35 +33,48 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
 ## Step 2: Start your cluster and define two namespaces.  <a name="step_2"></a>
 
    ```bash
-   alias kc='kubectl'
-   oc cluster up
-   oc new-project public
-   oc new-project private
+   $ alias kc='kubectl'
+   $ oc cluster up
+   $ oc new-project public
+   Now using project "public" on server "https://127.0.0.1:8443".
+   $ oc new-project private
+   Now using project "private" on server "https://127.0.0.1:8443".
    ```
 
 ## Step 3: Start Skupper in the public namespace.  <a name="step_3"></a>
 
    ```bash
-   kc config set-context --current --namespace=public
-   skupper status
-   skupper init --cluster-local --id public
-   skupper status
+   $ kc config set-context --current --namespace=public
+   $ skupper status
+   skupper not enabled for public
+   $ skupper init --cluster-local --id public
+   Skupper is now installed in 'public'.  Use 'skupper status' to get more information.
+   $ skupper status
+   Skupper enabled for "public". It is not connected to any other sites.
    ```
 
 ## Step 4: Make a connection token, and start the service. <a name="step_4"></a>
 
    ```bash
-   skupper connection-token ${HOME}/secret.yaml
-   oc apply -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
+   $ skupper connection-token ${HOME}/secret.yaml
+   token will only be valid for local cluster
+   $ oc apply -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
+   deployment.extensions/tcp-go-echo created
+   service/tcp-go-echo created
+
    ```
 
 ## Step 5: Start Skupper in the private namespace.  <a name="step_5"></a>
 
    ```bash
-   kc config set-context --current --namespace=private
-   skupper status
-   skupper init --cluster-local --id private
-   skupper status
+   $ kc config set-context --current --namespace=private
+   Context "private/127-0-0-1:8443/developer" modified.
+   $ skupper status
+   skupper not enabled for private
+   $ skupper init --cluster-local --id private
+   Skupper is now installed in 'private'.  Use 'skupper status' to get more information.
+   $ skupper status
+   Skupper enabled for "private". It is not connected to any other sites.
    ```
 
 
@@ -104,11 +117,17 @@ We demonstrated this using two namespaces in a single local cluster for ease of 
 Let's tidy up so no one trips over any of this stuff later. In the private namespace, delete the Skupper artifacts. In public, delete both Kubernetes and Skupper atrifacts.
 
    ```bash
-   kc config set-context --current --namespace=private
-   skupper delete
-   kc config set-context --current --namespace=public
-   kc delete -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
-   skupper delete
+   $ kc config set-context --current --namespace=private
+   Context "private/127-0-0-1:8443/developer" modified.
+   $ skupper delete
+   Skupper is now removed from 'private'.
+   $ kc config set-context --current --namespace=public
+   Context "private/127-0-0-1:8443/developer" modified.
+   $ kc delete -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
+   deployment.extensions "tcp-go-echo" deleted
+   service "tcp-go-echo" deleted
+   $ skupper delete
+   Skupper is now removed from 'public'.
    ```
 <br/>
 <br/>
