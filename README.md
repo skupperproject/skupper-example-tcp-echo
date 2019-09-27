@@ -36,14 +36,17 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
    $ oc cluster up
    $ oc new-project public
    Now using project "public" on server "https://127.0.0.1:8443".
+   ...
    $ oc new-project private
    Now using project "private" on server "https://127.0.0.1:8443".
+   ...
    ```
 
 ## Step 3: Start Skupper in the public namespace.  <a name="step_3"></a>
 
    ```
    $ kc config set-context --current --namespace=public
+   Context "private/127-0-0-1:8443/developer" modified.
    $ skupper status
    skupper not enabled for public
    $ skupper init --cluster-local --id public
@@ -57,7 +60,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
    ```
    $ skupper connection-token ${HOME}/secret.yaml
    token will only be valid for local cluster
-   $ oc apply -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
+   $ oc apply -f ${HOME}/tcp-echo-demo/example-tcp-echo/public-deployment-and-service.yaml
    deployment.extensions/tcp-go-echo created
    service/tcp-go-echo created
 
@@ -75,6 +78,14 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
    $ skupper status
    Skupper enabled for "private". It is not connected to any other sites.
    ```
+
+If you ever issue the "skupper status" command and see this response...
+
+   ```
+   Skupper enabled for "private". Status pending...
+   ```
+... just wait a few seconds and re-issue the command.
+
 
 
 ## Step 6: Make the connection.  <a name="step_6"></a>
@@ -122,11 +133,12 @@ Let's tidy up so no one trips over any of this stuff later. In the private names
    Skupper is now removed from 'private'.
    $ kc config set-context --current --namespace=public
    Context "private/127-0-0-1:8443/developer" modified.
-   $ kc delete -f ${HOME}/tcp-echo-demo/skupper-example-tcp-echo/public-deployment-and-service.yaml
+   $ kc delete -f ${HOME}/tcp-echo-demo/public-deployment-and-service.yaml
    deployment.extensions "tcp-go-echo" deleted
    service "tcp-go-echo" deleted
    $ skupper delete
    Skupper is now removed from 'public'.
+   $ oc cluster down
    ```
 <br/>
 <br/>
