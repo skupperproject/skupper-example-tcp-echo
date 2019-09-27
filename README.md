@@ -60,7 +60,7 @@ On your machine make a directory for this tutorial, clone the tutorial repo, and
    ```
    $ skupper connection-token ${HOME}/secret.yaml
    token will only be valid for local cluster
-   $ oc apply -f ${HOME}/tcp-echo-demo/example-tcp-echo/public-deployment-and-service.yaml
+   $ oc apply -f ${HOME}/tcp-echo-demo/public-deployment-and-service.yaml
    deployment.extensions/tcp-go-echo created
    service/tcp-go-echo created
 
