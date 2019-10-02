@@ -2,7 +2,9 @@
 
 This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public namespace and back again. We will use two namespaces for simplicity of setup, but this would work the same way on two separate clusters. 
 <br/>
-We will set up a Skupper network between the two namespaces, start a TCP echo-server on the public namespace, then communicate to it from the private namespace, and receive its replies. We will assume that Kubernetes is running on your local machine, and we will create and access both namespaces from within a single shell.
+We will set up a Skupper network between the two namespaces, start a TCP echo-server on the public namespace, then communicate to it from the private namespace and receive its replies. 
+<br/>
+We will assume that Kubernetes is running on your local machine, and we will create and access both namespaces from within a single shell.
 
 * [Prerequisites](#prereq)
 * [Step 1: Set up the demo.](#step_1)
