@@ -1,4 +1,4 @@
-# Skupper enables inter-cluster TCP communication.
+# Skupper enables inter-cluster TCP communication
 
 This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public namespace and back again. We will use two namespaces for simplicity of setup, but this would work the same way on two separate clusters. 
 <br/>
