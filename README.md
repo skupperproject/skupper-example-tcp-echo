@@ -1,118 +1,29 @@
 # Skupper enables inter-cluster TCP communication
 
-This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public namespace and back again. We will use two namespaces for simplicity of setup, but this would work the same way on two separate clusters. 
+
+
+TCP tunneling with [Skupper](https://skupper.io/)
+
+* [Overview](#overview)
+* [Prerequisites](#prerequisites)
+* [Step 1: Set up your namespaces](#step-1-set-up-your-namespaces)
+* [Step 2: Deploy the backend and frontend services](#step-2-deploy-the-backend-and-frontend-services)
+* [Step 3: Connect your namespaces](#step-3-connect-your-namespaces)
+* [Step 4: Expose the backend service on the Skupper network](#step-4-expose-the-backend-service-on-the-skupper-network)
+* [Step 5: Test the application](#step-5-test-the-application)
+* [What just happened?](#what-just-happened)
+* [Cleaning up](#cleaning-up)
+* [Next steps](#next-steps)
+
+
+## Overview
+
+This is a simple demonstration of TCP communication tunneled through a Skupper network from a private to a public cluster and back again. During development of this demonstration, the private cluster was running locally, while the public cluster was on AWS.
 <br/>
-We will set up a Skupper network between the two namespaces, start a TCP echo-server on the public namespace, then communicate to it from the private namespace and receive its replies. 
-<br/>
-We will assume that Kubernetes is running on your local machine, and we will create and access both namespaces from within a single shell.
-
-* [Prerequisites](#prereq)
-* [Step 1: Set up the demo.](#step_1)
-* [Step 2: Start your cluster and define two namespaces.](#step_2)
-* [Step 3: Start Skupper in the public namespace.](#step_3)
-* [Step 4: Make a connection token, and start the service.](#step_4)
-* [Step 5: Start Skupper in the private namespace..](#step_5)
-* [Step 6: Make the connection.](#step_6)
-* [Step 7: Communicate across namespaces.](#step_7)
-* [Step 8: Cleanup.](#step_8)
-
-## Prerequisites  <a name="prereq"></a>
-
-* The `kubectl` command-line tool, version 1.15 or later ([installation guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/))
-* The `skupper` command-line tool, the latest version ([installation guide](https://skupper.io/start/index.html#step-1-install-the-skupper-command-line-tool-in-your-environment))
-* Two Kubernetes namespaces, from any providers you choose, on any clusters you choose
-
-
-
-
-## Step 1: Set up the demo. <a name="step_1"></a>
-
-On your machine make a directory for this tutorial, clone the tutorial repo, and download the skupper CLI tool:
-
-   ```
-    mkdir ${HOME}/tcp-echo-demo
-    git clone https://github.com/skupperproject/skupper-example-tcp-echo ${HOME}/tcp-echo-demo
-   ```
-
-
-
-## Step 2: Start your cluster and define two namespaces.  <a name="step_2"></a>
-
-   ```
-   alias kc='kubectl'
-   oc cluster up
-   oc new-project public
-   oc new-project private
-   ```
-
-## Step 3: Start Skupper in the public namespace.  <a name="step_3"></a>
-
-   ```
-   kc config set-context --current --namespace=public
-   skupper init --cluster-local --id public
-   skupper status
-   ```
-
-## Step 4: Make a connection token, and start the service. <a name="step_4"></a>
-
-   ```
-   skupper connection-token ${HOME}/secret.yaml
-   oc apply -f ${HOME}/tcp-echo-demo/public-deployment-and-service.yaml
-
-   ```
-
-## Step 5: Start Skupper in the private namespace.  <a name="step_5"></a>
-
-   ```
-   kc config set-context --current --namespace=private
-   skupper init --cluster-local --id private
-   skupper status
-   ```
-
-## Step 6: Make the connection.  <a name="step_6"></a>
-
-After issuing the connect command, a new service will show up in this namespace called tcp-go-echo. (It may take as long as two minutes for the service to appear.)
-
-   ```
-   skupper connect ${HOME}/secret.yaml
-   kc get svc
-   ```
-
-
-## Step 7: Communicate across namespaces.  <a name="step_7"></a>
-
-Using the IP address and port number from the 'kc get svc' result, send a message to the local service. Skupper will route the message to the service that is running on the other namespace, and will route the reply back here.
-
-   ```
-   ADDR=`kubectl get svc/tcp-go-echo -o=jsonpath='{.spec.clusterIP}'`
-   PORT=`kubectl get svc/tcp-go-echo -o=jsonpath='{.spec.ports[0].port}'`
-   telnet ${ADDR} ${PORT}
-   Mr. Watson, come here. I want to see you.
-   tcp-go-echo-67c875768f-kt6dc : MR. WATSON, COME HERE. I WANT TO SEE YOU.
-   ```
-
-The tcp-go-echo program returns a capitalized version of the message, prepended by its name and pod ID.
-
-
-## What Just Happened ?
-
-Your <i>ncat</i> TCP message was received by the Skupper-created tcp-go-echo proxy in namespace 'private', wrapped in an AMQP message, and sent over the Skupper network to the Skupper-created proxy in the 'public' namespace. That proxy sent the TCP packets to the tcp-go-echo server (which knows nothing about AMQP), received its response, and reversed the process. After another trip over the Skupper network, the TCP response packets arrived back at our ncat process.
-<br/>
-We demonstrated this using two namespaces in a single local cluster for ease of demonstration, but the establishment and use of Skupper connectivity works just as easily between any two (or more) clusters, public or private, anywhere.
+We will set up a Skupper network between the two clusters, start a TCP echo-server on the public cluster, then communicate to it from the private cluster and receive its replies. At no time is any port opened on the machine running the private cluster.
 <br/>
 
 
-## Step 8: Cleanup. <a name="step_8"></a>
+<img src="images/entities.svg" width="640"/>
 
-Let's tidy up so no one trips over any of this stuff later. In the private namespace, delete the Skupper artifacts. In public, delete both Kubernetes and Skupper atrifacts.
 
-   ```
-   kc config set-context --current --namespace=private
-   skupper delete
-   kc config set-context --current --namespace=public
-   kc delete -f ${HOME}/tcp-echo-demo/public-deployment-and-service.yaml
-   skupper delete
-   oc cluster down
-   ```
-<br/>
-<br/>
