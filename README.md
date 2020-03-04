@@ -24,6 +24,6 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
 <br/>
 
 
-<img src="images/entities.svg" width="640"/>
+<img src="images/entities.svg" width="800"/>
 
 
