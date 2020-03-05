@@ -6,14 +6,8 @@ TCP tunneling with [Skupper](https://skupper.io/)
 
 * [Overview](#overview)
 * [Prerequisites](#prerequisites)
-* [Step 1: Set up your namespaces](#step-1-set-up-your-namespaces)
-* [Step 2: Deploy the backend and frontend services](#step-2-deploy-the-backend-and-frontend-services)
-* [Step 3: Connect your namespaces](#step-3-connect-your-namespaces)
-* [Step 4: Expose the backend service on the Skupper network](#step-4-expose-the-backend-service-on-the-skupper-network)
-* [Step 5: Test the application](#step-5-test-the-application)
-* [What just happened?](#what-just-happened)
-* [Cleaning up](#cleaning-up)
-* [Next steps](#next-steps)
+* [Step 1: Set up the demo](#step-1-set-up-the-demo)
+* [Step 2: xxx](#xxx)
 
 
 ## Overview
@@ -25,5 +19,34 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
 
 
 <img src="images/entities.svg" width="800"/>
+
+## Prerequisites
+
+* The `kubectl` command-line tool, version 1.15 or later ([installation guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/))
+* The `skupper` command-line tool, the latest version ([installation guide](https://skupper.io/start/index.html#step-1-install-the-skupper-command-line-tool-in-your-environment))
+* Two Kubernetes namespaces, from any providers you choose, on any clusters you choose. ( In this example, the namespaces are called 'public' and 'private'. )
+* A private cluster running on your local machine.
+* A public cluster is running on a public cloud provider.
+
+
+## Step 1: Set up the demo
+
+1. On your local machine, make a directory for this tutorial and clone the example repo:
+
+   ```bash
+   mkdir pg-demo
+   cd pg-demo
+   git clone https://github.com/skupperproject/skupper-example-tcp-echo
+
+   ```
+
+2. Prepare the target clusters.
+
+   1. On your local machine, log in to both clusters in a separate terminal session.
+   2. In the local cluster create the namespace 'private'. In the remote cluster, create the namespace 'public'.
+   3. In each cluster, set the kubectl config context to use the demo namespace [(see kubectl cheat sheet)](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+
+
+
 
 
