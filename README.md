@@ -7,7 +7,7 @@ TCP tunneling with [Skupper](https://skupper.io/)
 * [Overview](#overview)
 * [Prerequisites](#prerequisites)
 * [Step 1: Set up the demo](#step-1-set-up-the-demo)
-* [Step 2: Deploy the Virtual Application Network](#step-2-deploy-the-virtual-application-network)
+* [Step 2: Deploy the Virtual Application Network](#step-2-set-up-the-virtual-application-network)
 
 
 
