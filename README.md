@@ -8,6 +8,7 @@ TCP tunneling with [Skupper](https://skupper.io/)
 * [Prerequisites](#prerequisites)
 * [Step 1: Set up the demo](#step-1-set-up-the-demo)
 * [Step 2: Deploy the Virtual Application Network](#step-2-set-up-the-virtual-application-network)
+* [Step 3: Access the public service remotely](#step-3-access-the-public-service-remotely)
 
 
 
@@ -80,11 +81,40 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
 
    ```bash
    skupper init
-   skupper connect ${HOME}/tcp-echo//public_secret.yaml
+   skupper connect ${HOME}/tcp-echo/public_secret.yaml
    ```
 
-5. See that Skupper is now exposing the public-cluster tcp-echo service on this cluster. (This may take a few seconds. If it's not there immediately, wait a few seconds and try again.) :
+5. See that Skupper is now exposing the public-cluster tcp-echo service on this private cluster. (This may take a few seconds. If it's not there immediately, wait a few seconds and try again.) :
 
    ```bash
    kubectl get svc
+
+   # Example output :
+   # NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)               AGE
+   # skupper-internal    ClusterIP   172.30.202.39    <none>        55671/TCP,45671/TCP   22s
+   # skupper-messaging   ClusterIP   172.30.207.178   <none>        5671/TCP              22s
+   # tcp-go-echo         ClusterIP   172.30.106.241   <none>        9090/TCP              8s
+
    ```
+
+
+## Step 3: Access the public service remotely
+
+One the private cluster, run telnet on the cluster-IP and port that Skupper has exposed for the tcp-echo service.
+
+   ```bash
+   telnet 172.30.106.241 9090
+   Trying 172.30.106.241...
+   Connected to 172.30.106.241.
+   Escape character is '^]'.
+   Do what thou wilt shall be the whole of the law.
+   tcp-go-echo-f55984966-v5px2 : DO WHAT THOU WILT SHALL BE THE WHOLE OF THE LAW.
+   ^]
+   telnet> quit
+   Connection closed.
+   ```
+ 
+
+
+
+
