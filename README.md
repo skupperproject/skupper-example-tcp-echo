@@ -58,7 +58,7 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
    ```bash
    kubectl create namespace public
    kubectl config set-context --current --namespace=public
-   kubectl apply -f tcp-echo/public-deployment.yaml
+   kubectl apply -f ${HOME}/tcp-echo/public-deployment.yaml
    ```
 
 2. Still in the public cluster, start Skupper, expose the tcp-echo deployment, and generate a connection token :
