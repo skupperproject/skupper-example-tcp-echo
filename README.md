@@ -34,8 +34,8 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
 1. On your local machine, make a directory for this tutorial and clone the example repo:
 
    ```bash
-   mkdir pg-demo
-   cd pg-demo
+   mkdir tcp-echo
+   cd tcp-echo
    git clone https://github.com/skupperproject/skupper-example-tcp-echo
 
    ```
