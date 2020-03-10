@@ -9,6 +9,9 @@ TCP tunneling with [Skupper](https://skupper.io/)
 * [Step 1: Set up the demo](#step-1-set-up-the-demo)
 * [Step 2: Deploy the Virtual Application Network](#step-2-set-up-the-virtual-application-network)
 * [Step 3: Access the public service remotely](#step-3-access-the-public-service-remotely)
+* [Cleaning up](#cleaning-up)
+* [Next steps](#next-steps)
+
 
 
 
@@ -117,4 +120,27 @@ One the private cluster, run telnet on the cluster-IP and port that Skupper has 
 
 
 
+## Cleaning Up
+
+Delete the pod and the virtual application network that were created in the demonstration.
+
+1. In the terminal for the **public** cluster:
+
+   ```bash
+   # Get POD ID with 'kubectl get pods'
+   $ kubectl delete pod tcp-go-echo-<POD-ID>
+   $ skupper delete
+   ```
+
+2. In the terminal for the **private** cluster:
+
+   ```bash
+   $ skupper delete
+   ```
+
+
+## Next steps
+
+ - [Try the example for Sharing a PostgreSQL database across clusters](https://github.com/skupperproject/skupper-example-postgresql)
+ - [Find more examples](https://skupper.io/examples/)
 
