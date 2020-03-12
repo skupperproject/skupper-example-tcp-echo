@@ -9,6 +9,7 @@ TCP tunneling with [Skupper](https://skupper.io/)
 * [Step 1: Set up the demo](#step-1-set-up-the-demo)
 * [Step 2: Deploy the Virtual Application Network](#step-2-set-up-the-virtual-application-network)
 * [Step 3: Access the public service remotely](#step-3-access-the-public-service-remotely)
+* [What just happened?](#what-just-happened)
 * [Cleaning up](#cleaning-up)
 * [Next steps](#next-steps)
 
@@ -119,6 +120,16 @@ One the private cluster, run telnet on the cluster-IP and port that Skupper has 
    Connection closed.
    ```
  
+
+## What just happened?
+
+The TCP echo server was deployed and running on a publicly accessible cluster. The use of Skupper on that cluster allowed us to generate a connection token, which we then used to securely connect to the public cluster from our privat one. Since the connection was initiated by the Skupper instance on the private cluster, no ports on the private cluster were opened.
+<br/>
+Because we told Skupper to expose the TCP Echo service, when the two Skupper instances connected with each other the private instance learned about that service. The Skupper instance on the private cluster then made a forwarder to that service available on its cluster. 
+<br/>
+We were then able to use telnet to send TCP messages to an IP address and port on the private cluster which Skupper then forwarded to the actual service running in public. Skupper then brought the response back to us, making it feel as if the service were runing locally.
+<br/>
+All Skupper traffic between the two clusters was TLS encrypted.
 
 
 
