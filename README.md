@@ -48,7 +48,7 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
 2. Prepare the target clusters.
 
    1. On your local machine, log in to both clusters in a separate terminal session.
-   2. In each cluster, set the kubectl config context to use the demo namespace [(see kubectl cheat sheet)](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+   2. In each cluster, set the kubectl config context to use the demo namespace [(see Skupper Getting Started Guide)](https://skupper.io/start/index.html)
 
 
 
@@ -72,6 +72,8 @@ We will set up a Skupper network between the two clusters, start a TCP echo-serv
    skupper expose --port 9090 deployment tcp-go-echo
    skupper connection-token ${HOME}/tcp-echo/public_secret.yaml
    ```
+
+   Please Note: The connection token contains a secret and should only be shared with trusted sites.
 
 3. In the private cluster, create the private namespace : 
 
