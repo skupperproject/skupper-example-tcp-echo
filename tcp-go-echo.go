@@ -41,10 +41,8 @@ func cnx_handler(cnx_number int,
 	fp(os.Stdout, "TCP handler for connection %d exiting.\n", cnx_number)
 }
 
-func main() {
+func Run(port string, stopCh chan interface{}) {
 	cnx_count := 0
-
-	port := "9090"
 
 	// Listen for TCP connections on any interface on this port.
 	tcp_listener, _ := net.Listen("tcp", ":"+port)
@@ -57,9 +55,18 @@ func main() {
 	// one what number it is so the user can see which handler is
 	// printing out each message.
 	for {
-		cnx, _ := tcp_listener.Accept()
-		cnx_count++
-		fp(os.Stdout, "server: made connection %d.\n", cnx_count)
-		go cnx_handler(cnx_count, hostname, cnx)
+		select {
+		case <-stopCh:
+			break
+		default:
+			cnx, _ := tcp_listener.Accept()
+			cnx_count++
+			fp(os.Stdout, "server: made connection %d.\n", cnx_count)
+			go cnx_handler(cnx_count, hostname, cnx)
+		}
 	}
+}
+
+func main() {
+	Run("9090", make(chan interface{}))
 }
