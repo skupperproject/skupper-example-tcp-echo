@@ -8,14 +8,14 @@ FORMAT_OPTIONS = --format docker
 
 .DEFAULT_GOAL := build
 
-build:
+build: clean
 	podman build --no-cache --platform $(PLATFORM) --manifest $(IMAGE_NAME) $(FORMAT_OPTIONS) .
 
 push:
 	podman manifest push $(IMAGE_NAME)
 
 clean:
-	podman manifest rm $(IMAGE_NAME)
+	-podman manifest rm $(IMAGE_NAME)
 
 check:
 	podman manifest inspect $(IMAGE_NAME)
