@@ -1,6 +1,6 @@
 
 IMAGE_NAME = quay.io/skupper/tcp-go-echo
-PLATFORM = linux/amd64,linux/arm64
+PLATFORM = linux/amd64,linux/arm64,linux/s390x
 
 # The option below creates the images in the docker format.
 # That is required for their use with Openshift 3.11
