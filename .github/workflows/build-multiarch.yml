@@ -1,0 +1,25 @@
+name: Build and Push Multi-Arch Image
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Log in to Quay using Podman
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+          registry: quay.io
+
+      - name: Build Multi-Arch Image
+        run: make build
+
+      - name: Push Multi-Arch Image
+        run: make push
